@@ -17,7 +17,10 @@ module.exports.Router = (function(R,utility,url,qs,debug,domain){
 				params: null,
 				split: null,
 				fn: function(req,res){
-					res.writeHead(404,{ 'content-type': "text/plain",'x-powered-by':"router@0.1"});
+					res.writeHead(404,{ 
+						'content-type': "text/plain",
+					'x-powered-by':"router@0.1"});
+
 					res.end("Page Not Found!");
 					Router.debug.custom(req,'page not found from');
 				}

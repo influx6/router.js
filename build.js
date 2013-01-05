@@ -5,5 +5,5 @@ js.compile({
 	src_dir:"./src",
 	name:"router.js",
 	uglify: uglify,
-	src:['./rutility.js','./router.js']
+	src:['./rutility.js','./router.js','./routerware.js']
 });
