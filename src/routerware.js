@@ -13,7 +13,7 @@ module.exports.RouterWare = (function(toolstack,R,url){
 			res.end('Request not found!');
 		};
 
-		return router = ts.Middleware(function(key){
+		return ts.Middleware(function(key){
 			if(!key) key = "/";
 			// if('/' === key[key.length - 1] && key.length > 1) key = key.slice(0,-1);
 			var route = r.processMount(key).mount;
@@ -25,6 +25,7 @@ module.exports.RouterWare = (function(toolstack,R,url){
 			if(key.test(path.pathname) || key.test('/')) return true;
 			else return false;
 		},notfoundhandler);
+
 	};
 
 
