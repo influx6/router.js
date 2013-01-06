@@ -17,14 +17,23 @@ module.exports.RouterWare = (function(toolstack,R,url){
 				var route = /\*/; route.binding = '*';
 				return route;
 			}
-			var route = r.processMount(key).mount;
+			var procs = r.processMount(key);
+			var route = procs.mount;
+			route.params = procs.params;
+			route.setsplit = procs.split;
 			route.binding = key;
+
 			return route;
 
 		},function(key,req,res){
+			req.urlParams = req.urlParams || {};
 			var path = url.parse(req.url),pathname = path.pathname;
 			if('/' === pathname[pathname.length - 1] && pathname.length > 1) pathname = pathname.slice(0,-1);
-			if(key.test(pathname) || key.test('*')) return true;
+			if(key.test(pathname) || key.test('*')){
+				var clean = pathname.split('/');
+				req.urlParams = r.params(key.setsplit,util.makeSplice(clean,1,clean.length));
+				return true;
+			}
 			else return false;
 		},notfoundhandler);
 

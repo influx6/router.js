@@ -63,6 +63,17 @@ module.exports.R = (function(utility,debug){
 			return true;
 		};
 
+		R.params = function(templ,keys){
+			console.log(templ,keys);
+			if(!templ || !keys) return;
+			var params = {};
+			utility.eachAsync(templ,function(e,i,o){
+			   var k = e.split(':'), c = keys[i];
+			   if(k[1]) params[k[1]] = c;
+			},null,this);
+			return params;
+		};
+
 		R.matchrs = {
 			root: /^\/$/,
 			basic: /\/([\w|\d|\-|\_]+)|\//,
@@ -365,14 +376,25 @@ module.exports.R = (function(utility,debug){
 				var route = /\*/; route.binding = '*';
 				return route;
 			}
-			var route = r.processMount(key).mount;
+			var procs = r.processMount(key);
+			var route = procs.mount;
+			route.params = procs.params;
+			route.setsplit = procs.split;
 			route.binding = key;
+
+			console.log(route);
 			return route;
 
 		},function(key,req,res){
+			req.urlParams = req.urlParams || {};
 			var path = url.parse(req.url),pathname = path.pathname;
 			if('/' === pathname[pathname.length - 1] && pathname.length > 1) pathname = pathname.slice(0,-1);
-			if(key.test(pathname) || key.test('*')) return true;
+			if(key.test(pathname) || key.test('*')){
+				var clean = pathname.split('/');
+				req.urlParams = r.params(key.setsplit,util.makeSplice(clean,1,clean.length));
+				console.log(req.urlParams);
+				return true;
+			}
 			else return false;
 		},notfoundhandler);
 

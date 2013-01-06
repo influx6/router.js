@@ -34,6 +34,12 @@ ware.use('/admins/:id',function(req,res,next){
 	return next();
 });
 
+ware.use('/admins/:id/:country',function(req,res,next){
+	res.writeHead(200,{ 'content-type':'text/plain'});
+	res.end('wecome admin with id and country:');
+	return next();
+});
+
 ware.use('/a/1',function(req,res,next){
 	res.writeHead(302,{ 
 		'content-type':'text/plain',

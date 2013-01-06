@@ -63,6 +63,16 @@ module.exports.R = (function(utility,debug){
 			return true;
 		};
 
+		R.params = function(templ,keys){
+			if(!templ || !keys) return;
+			var params = {};
+			utility.eachAsync(templ,function(e,i,o){
+			   var k = e.split(':'), c = keys[i];
+			   if(k[1]) params[k[1]] = c;
+			},null,this);
+			return params;
+		};
+
 		R.matchrs = {
 			root: /^\/$/,
 			basic: /\/([\w|\d|\-|\_]+)|\//,
