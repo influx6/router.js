@@ -1,8 +1,22 @@
-module.exports.R = (function(utility){
+module.exports.R = (function(utility,debug){
 
-	var R = {
+	var debug = debug,
+	R = {
 		Errors: {}
 	};
+
+		// R.log = {
+		// 	default: function(req,msg,to){
+		// 		var path = url.parse(req.url),host = req.headers.host;
+		// 		return utility.makeString(" ","Info:".red,req.method.green,"Page".grey,path.pathname.green,msg.grey,host.magenta,"on".grey,(new Date()).toUTCString().yellow);
+		// 	},
+		// 	redirect: function(req,to){
+		// 		debug.log(this.default(req,"redirect to "+to.green+" from".grey));
+		// 	},
+		// 	custom: function(req,message,to){
+		// 		debug.log(this.default(req,message,to));
+		// 	}
+		// };
 
 		R.basic = {
 			find : function(item){
@@ -342,23 +356,26 @@ module.exports.R = (function(utility){
 	return function(notfoundhandler){
 
 		if(!notfoundhandler) notfoundhandler = function(req,res){
-			if(res._header);
-			res.writeHead(404,{'Content-Type':'text/plain'});
+			res.writeHead(404,{ 'content-type':'text/plain'});
 			res.end('Request not found!');
 		};
 
-		return router = ts.Middleware(function(key){
-			if(!key) key = "/";
-			// if('/' === key[key.length - 1] && key.length > 1) key = key.slice(0,-1);
+		return ts.Middleware(function(key){
+			if(!key){
+				var route = /\*/; route.binding = '*';
+				return route;
+			}
 			var route = r.processMount(key).mount;
 			route.binding = key;
 			return route;
 
 		},function(key,req,res){
-			var path = url.parse(req.url);
-			if(key.test(path.pathname) || key.test('/')) return true;
+			var path = url.parse(req.url),pathname = path.pathname;
+			if('/' === pathname[pathname.length - 1] && pathname.length > 1) pathname = pathname.slice(0,-1);
+			if(key.test(pathname) || key.test('*')) return true;
 			else return false;
 		},notfoundhandler);
+
 	};
 
 

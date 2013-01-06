@@ -1,8 +1,22 @@
-module.exports.R = (function(utility){
+module.exports.R = (function(utility,debug){
 
-	var R = {
+	var debug = debug,
+	R = {
 		Errors: {}
 	};
+
+		// R.log = {
+		// 	default: function(req,msg,to){
+		// 		var path = url.parse(req.url),host = req.headers.host;
+		// 		return utility.makeString(" ","Info:".red,req.method.green,"Page".grey,path.pathname.green,msg.grey,host.magenta,"on".grey,(new Date()).toUTCString().yellow);
+		// 	},
+		// 	redirect: function(req,to){
+		// 		debug.log(this.default(req,"redirect to "+to.green+" from".grey));
+		// 	},
+		// 	custom: function(req,message,to){
+		// 		debug.log(this.default(req,message,to));
+		// 	}
+		// };
 
 		R.basic = {
 			find : function(item){
