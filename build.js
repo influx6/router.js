@@ -5,7 +5,7 @@ js.compile({
 	src_dir:"./src",
 	name:"router.js",
 	uglify: uglify,
-	src:['./rutility.js','./router.js','./routerware.js']
+	src:['./rutil.js','./router.js','./routerware.js']
 });
 
 js.compile({
@@ -13,5 +13,5 @@ js.compile({
 	src_dir:"./src/middleware",
 	name:"middlewares.js",
 	uglify: uglify,
-	src:['./bodyparser.js']
+	src:['./bodyparser.js','fileserver.js']
 });

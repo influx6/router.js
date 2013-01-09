@@ -3,13 +3,14 @@ module.exports.RouterWare = (function(toolstack,R,url){
 	var ts = toolstack,
 	util = ts.Utility,
 	url = url,
-	r = R(util);
+	r = R;
 
 	return function(notfoundhandler){
 
 		if(!notfoundhandler) notfoundhandler = function(req,res){
 			res.writeHead(404,{ 'content-type':'text/plain'});
 			res.end('Request not found!');
+			req.destroy();
 		};
 
 		return ts.Middleware(function(key){
@@ -17,7 +18,8 @@ module.exports.RouterWare = (function(toolstack,R,url){
 				var route = /\*/; route.binding = '*';
 				return route;
 			}
-			var procs = r.processMount(key);
+			var open = key[key.length - 1] === '*' ? true : false;
+			var procs = r.processMount(key,open);
 			var route = procs.mount;
 			route.params = procs.params;
 			route.setsplit = procs.split;
@@ -26,12 +28,18 @@ module.exports.RouterWare = (function(toolstack,R,url){
 			return route;
 
 		},function(key,req,res){
-			req.urlParams = req.urlParams || {};
-			var path = url.parse(req.url),pathname = path.pathname;
+
+			req.originalUrl = req.url;
+			req.params = req.params || {};
+			req.res = res;
+			res.req = req;
+
+			var path = url.parse(req.url),pathname = decodeURIComponent(path.pathname);
+			pathname = pathname.replace(/\/+$/,'/'); path.pathname = pathname;
 			if('/' === pathname[pathname.length - 1] && pathname.length > 1) pathname = pathname.slice(0,-1);
 			if(key.test(pathname) || key.test('*')){
 				var clean = pathname.split('/');
-				req.urlParams = r.params(key.setsplit,util.makeSplice(clean,1,clean.length));
+				req.params = r.params(key.setsplit,util.makeSplice(clean,1,clean.length));
 				return true;
 			}
 			else return false;
