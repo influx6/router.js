@@ -13,5 +13,5 @@ js.compile({
 	src_dir:"./src/middleware",
 	name:"middlewares.js",
 	uglify: uglify,
-	src:['./bodyparser.js','fileserver.js']
+	src:['./bodyparser.js','fileserver.js','logger.js','query.js']
 });

@@ -1,4 +1,4 @@
-module.exports.FileServer = function(util,r,fs,url,path){
+module.exports.FileServer = function(util,r,fs,url,path,send){
 
 	return function(dir,options){
 
@@ -16,8 +16,22 @@ module.exports.FileServer = function(util,r,fs,url,path){
 			loc = path.normalize(path.join(dir,pathname));
 
 
+			if(!fs.existsSync(loc)){ 
+				// res.writeHead(404); res.end();
+				return next(r.error(404));
+			} 
+
+
+			var checkMaliciousnes = function(path){
+				//check if it has '..' in it
+				if(path.match(/\/\.\w+\W*\w*$/) || ( -1 !== path.indexOf('..'))){
+					// res.writeHead(400); res.end();
+					return next(r.error(400));
+				}
+			};
+
 			var directory = function(path){
-				//will redirect
+				return next();
 			};
 
 			fs.stat(loc,function(err,stat){
@@ -25,6 +39,9 @@ module.exports.FileServer = function(util,r,fs,url,path){
 
 				if(stat.isDirectory()) directory(path);
 				else{
+
+					checkMaliciousnes(pathname);
+
 					var stream = fs.createReadStream(loc);
 					stream.pipe(res);
 
@@ -42,6 +59,7 @@ module.exports.FileServer = function(util,r,fs,url,path){
 					})
 				}
 			});
+			
 
 			// log.log(util.makeString(" ",JSON.stringify(uri),pathname,loc));
 			// return next();

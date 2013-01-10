@@ -236,46 +236,46 @@ module.exports.R = (function(utility){
 		//     // .body = { error: msg || 'Forbidden' };
 		// };
 
-	// if(typeof require !== 'undefined' && typeof module !== 'undefined' && 
-	// 	typeof window === 'undefined'){
+	if(typeof require !== 'undefined' && typeof module !== 'undefined' && 
+		typeof window === 'undefined'){
 
 
-	// 	/*!
-	// 	 * Connect - utils
-	// 	 * Copyright(c) 2010 Sencha Inc.
-	// 	 * Copyright(c) 2011 TJ Holowaychuk
-	// 	 * MIT Licensed
-	// 	 */
+		/*!
+		 * Connect - utils
+		 * Copyright(c) 2010 Sencha Inc.
+		 * Copyright(c) 2011 TJ Holowaychuk
+		 * MIT Licensed
+		 */
 
-	// 	var http = require('http'), crypto = require('crypto');
+		var http = require('http'), crypto = require('crypto');
 
-	// 	R.mime = function(req){
-	// 		return (req.headers['content-type'] || '').split(';');
-	// 	};
+		R.mime = function(req){
+			return (req.headers['content-type'] || '').split(';');
+		};
 
-	// 	R.error = function(code,message){
-	// 		var err = new Error(message || R.HttpStatusCodes[code]);
-	// 		err.status = err;
-	// 		return err;
-	// 	};
+		R.error = function(code,message){
+			var err = new Error(message || R.HttpStatusCodes[code]);
+			err.status = err;
+			return err;
+		};
 
-	// 	R.md5 = function(str,encoding){
-	// 		return crypto.createHash('md5').update(str).digest(encoding || 'hex');
-	// 	};
+		R.md5 = function(str,encoding){
+			return crypto.createHash('md5').update(str).digest(encoding || 'hex');
+		};
 
-	// 	R.uid = function(len) {
-	// 	  return crypto.randomBytes(Math.ceil(len * 3 / 4))
-	// 	    .toString('base64')
-	// 	    .slice(0, len);
-	// 	};
+		R.uid = function(len) {
+		  return crypto.randomBytes(Math.ceil(len * 3 / 4))
+		    .toString('base64')
+		    .slice(0, len);
+		};
 
-	// 	R.unauthorized = function(res, realm) {
-	// 	  res.statusCode = 401;
-	// 	  res.setHeader('WWW-Authenticate', 'Basic realm="' + realm + '"');
-	// 	  res.end('Unauthorized');
-	// 	};
+		R.unauthorized = function(res, realm) {
+		  res.statusCode = 401;
+		  res.setHeader('WWW-Authenticate', 'Basic realm="' + realm + '"');
+		  res.end('Unauthorized');
+		};
 
-	// };
+	};
 
 
 

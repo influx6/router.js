@@ -63,7 +63,7 @@ module.exports.BodyParser = function(util,qs){
 
 };
 
-module.exports.FileServer = function(util,r,fs,url,path){
+module.exports.FileServer = function(util,r,fs,url,path,send){
 
 	return function(dir,options){
 
@@ -81,8 +81,22 @@ module.exports.FileServer = function(util,r,fs,url,path){
 			loc = path.normalize(path.join(dir,pathname));
 
 
+			if(!fs.existsSync(loc)){ 
+				// res.writeHead(404); res.end();
+				return next(r.error(404));
+			} 
+
+
+			var checkMaliciousnes = function(path){
+				//check if it has '..' in it
+				if(path.match(/\/\.\w+\W*\w*$/) || ( -1 !== path.indexOf('..'))){
+					// res.writeHead(400); res.end();
+					return next(r.error(400));
+				}
+			};
+
 			var directory = function(path){
-				//will redirect
+				return next();
 			};
 
 			fs.stat(loc,function(err,stat){
@@ -90,6 +104,9 @@ module.exports.FileServer = function(util,r,fs,url,path){
 
 				if(stat.isDirectory()) directory(path);
 				else{
+
+					checkMaliciousnes(pathname);
+
 					var stream = fs.createReadStream(loc);
 					stream.pipe(res);
 
@@ -107,10 +124,61 @@ module.exports.FileServer = function(util,r,fs,url,path){
 					})
 				}
 			});
+			
 
 			// log.log(util.makeString(" ",JSON.stringify(uri),pathname,loc));
 			// return next();
 		};
 	};
 
+};var url = require('url');
+
+module.exports.Logger = function(ts,R){
+	var Console = ts.Console.init('node'),
+	util = ts.Utility, r = R;
+
+	return function LoggerSetUp(options){
+
+		var format = function(host,port,url,method,message){
+			return util.makeString(" ",'Info'.grey, method.green,'Page',url.yellow,message,host.red,':'+port.red);
+		};
+
+		return function Logger(req,res,next){
+			if(req._logged) return next();
+
+			var host = req.socket.remoteAddress,
+			port = req.socket.port,
+			url = url.parse(req.url),
+			method = req.method;
+
+			var get = format(host,port,url.pathname,method,'request page from');
+			var post = format(host,port,url.pathname,method,'posted message to');
+
+			if(options.immediate){
+
+			}else{
+
+				var res_end = res.end;
+				res.end = function(chunk,encoding){
+					res.end = res_end;
+					res.end(chunk,encoding);
+					Console.log();
+
+				}
+			}
+		};
+
+	};
+};var qs = require('querystring'),
+url = require('url');
+
+module.exports.Query = function query(options){
+  return function query(req, res, next){
+    if (!req.query) {
+      req.query = ~req.url.indexOf('?')
+        ? qs.parse(url.parse(req.url).query)
+        : {};
+    }
+    next();
+  };
 };

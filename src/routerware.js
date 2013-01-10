@@ -7,9 +7,12 @@ module.exports.RouterWare = (function(toolstack,R,url){
 
 	return function(notfoundhandler){
 
-		if(!notfoundhandler) notfoundhandler = function(req,res){
-			res.writeHead(404,{ 'content-type':'text/plain'});
-			res.end('Request not found!');
+		if(!notfoundhandler) notfoundhandler = function(err,req,res){
+			var status = (err && err.status) ? err.status : 404;
+			var message = (err && err.message) ? err.message  : "Request Not Found!";
+
+			res.writeHead(status,{ 'content-type':'text/plain'});
+			res.end(message);
 			req.destroy();
 		};
 
