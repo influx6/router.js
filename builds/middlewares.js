@@ -1,9 +1,12 @@
-module.exports.BodyParser = function(util,qs){
+;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
+Middleware.BodyParser = function BodyParserSetup(r){
 
-	var formidable = require('formidable');
-	return function BodyParser(options) {
+	var util = require('toolstack').ToolStack.Utility, qs = require('querystring'),
+	formidable = require('formidable');
+
+	return function BodyParserOptions(options) {
 		
-		return function(req,res,next){
+		return function BodyParser(req,res,next){
 			if(req._body) return next();
 
 			req.body = req.body || {}; 
@@ -11,7 +14,7 @@ module.exports.BodyParser = function(util,qs){
 
 
 			if("get" === req.method.toLowerCase() || 'head' === req.method.toLowerCase()) return next();
-			// if(req.headers['content-type'].split(';')[0] !== 'multipart/form-data') return next();
+			if(req.headers['content-type'].split(';')[0] !== 'multipart/form-data') return next();
 
 			var done = false, proceed = next, 
 			param = { data: {}, files: {}},
@@ -63,9 +66,13 @@ module.exports.BodyParser = function(util,qs){
 
 };
 
-module.exports.FileServer = function(util,r,fs,url,path,send){
+;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
+Middleware.FileServer = function FileServerSetup(r){
 
-	return function(dir,options){
+	var util = require('toolstack').ToolStack.Utility, r = r,
+	path = require('path'), fs = require('fs');
+
+	return function FileServerOptions(dir,options){
 
 		var root = dir, settings = options;
 
@@ -131,54 +138,81 @@ module.exports.FileServer = function(util,r,fs,url,path,send){
 		};
 	};
 
-};var url = require('url');
+};;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
+Middleware.Logger = function LoggerSetup(r){
 
-module.exports.Logger = function(ts,R){
-	var Console = ts.Console.init('node'),
-	util = ts.Utility, r = R;
+	var ts = require('toolstack').ToolStack,
+	Console = ts.Console.init('node'),
+	url = require('url'),
+	util = ts.Utility, r = r;
 
-	return function LoggerSetUp(options){
+	return function LoggerOptions(options){
 
 		var format = function(host,port,url,method,message){
-			return util.makeString(" ",'Info'.grey, method.green,'Page',url.yellow,message,host.red,':'+port.red);
+			return util.makeString(" ",'Info:'.grey,method.green,'Page'.grey,url.yellow,message.grey,host.magenta+':'+port.magenta,"on".grey,(new Date()).toUTCString().grey);
 		};
 
 		return function Logger(req,res,next){
 			if(req._logged) return next();
 
 			var host = req.socket.remoteAddress,
-			port = req.socket.port,
-			url = url.parse(req.url),
+			port = req.headers.host.split(':')[1],
+			pathname = url.parse(req.url).pathname,
 			method = req.method;
 
-			var get = format(host,port,url.pathname,method,'request page from');
-			var post = format(host,port,url.pathname,method,'posted message to');
+			req._logged = true;
+
+			function choice(state){
+				if(state === 'get') return format(host,port,pathname,method,'requested from');
+				if(state === 'post') return format(host,port,pathname,method,'posted message to');
+				if(state === 'head') return format(host,port,pathname,method,'headers requested from');
+			};
+			
 
 			if(options.immediate){
-
+				Console.log(choice(method.toLowerCase()));
 			}else{
-
 				var res_end = res.end;
 				res.end = function(chunk,encoding){
 					res.end = res_end;
 					res.end(chunk,encoding);
-					Console.log();
-
-				}
+					Console.log(choice(method.toLowerCase()));
+					return;
+				};
 			}
+
+			return next();
 		};
 
 	};
-};var qs = require('querystring'),
-url = require('url');
+};var Middleware = module.exports.Middleware = module.exports.Middleware || {};
+Middleware.Query = function QuerySetup(r){
 
-module.exports.Query = function query(options){
-  return function query(req, res, next){
-    if (!req.query) {
-      req.query = ~req.url.indexOf('?')
-        ? qs.parse(url.parse(req.url).query)
-        : {};
-    }
-    next();
-  };
-};
+  var qs = require('querystring'),url = require('url');
+
+	return function QueryOptions(options){
+		
+	  return function Query(req, res, next){
+	    if (!req.query) {
+	      req.query = ~req.url.indexOf('?')
+	        ? qs.parse(url.parse(req.url).query)
+	        : {};
+	    }
+	    next();
+	  };
+
+	};
+
+};;module.exports.InitWare = function InitWare(){
+
+
+	if(!this.Middleware || this.Middleware.initd) return;
+	var wares = this.Middleware, r = this.R;
+	util = require('toolstack').ToolStack.Utility;
+
+	util.forEach(wares,function(e,i,o){
+		wares[i] = e(r);
+	});
+
+	this.Middleware.initd = true;
+}

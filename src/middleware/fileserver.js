@@ -1,6 +1,10 @@
-module.exports.FileServer = function(util,r,fs,url,path,send){
+;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
+Middleware.FileServer = function FileServerSetup(r){
 
-	return function(dir,options){
+	var util = require('toolstack').ToolStack.Utility, r = r,
+	path = require('path'), fs = require('fs');
+
+	return function FileServerOptions(dir,options){
 
 		var root = dir, settings = options;
 

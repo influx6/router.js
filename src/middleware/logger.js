@@ -1,38 +1,47 @@
-var url = require('url');
+;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
+Middleware.Logger = function LoggerSetup(r){
 
-module.exports.Logger = function(ts,R){
-	var Console = ts.Console.init('node'),
-	util = ts.Utility, r = R;
+	var ts = require('toolstack').ToolStack,
+	Console = ts.Console.init('node'),
+	url = require('url'),
+	util = ts.Utility, r = r;
 
-	return function LoggerSetUp(options){
+	return function LoggerOptions(options){
 
 		var format = function(host,port,url,method,message){
-			return util.makeString(" ",'Info'.grey, method.green,'Page',url.yellow,message,host.red,':'+port.red);
+			return util.makeString(" ",'Info:'.grey,method.green,'Page'.grey,url.yellow,message.grey,host.magenta+':'+port.magenta,"on".grey,(new Date()).toUTCString().grey);
 		};
 
 		return function Logger(req,res,next){
 			if(req._logged) return next();
 
 			var host = req.socket.remoteAddress,
-			port = req.socket.port,
-			url = url.parse(req.url),
+			port = req.headers.host.split(':')[1],
+			pathname = url.parse(req.url).pathname,
 			method = req.method;
 
-			var get = format(host,port,url.pathname,method,'request page from');
-			var post = format(host,port,url.pathname,method,'posted message to');
+			req._logged = true;
+
+			function choice(state){
+				if(state === 'get') return format(host,port,pathname,method,'requested from');
+				if(state === 'post') return format(host,port,pathname,method,'posted message to');
+				if(state === 'head') return format(host,port,pathname,method,'headers requested from');
+			};
+			
 
 			if(options.immediate){
-
+				Console.log(choice(method.toLowerCase()));
 			}else{
-
 				var res_end = res.end;
 				res.end = function(chunk,encoding){
 					res.end = res_end;
 					res.end(chunk,encoding);
-					Console.log();
-
-				}
+					Console.log(choice(method.toLowerCase()));
+					return;
+				};
 			}
+
+			return next();
 		};
 
 	};

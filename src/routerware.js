@@ -1,11 +1,13 @@
-module.exports.RouterWare = (function(toolstack,R,url){
+module.exports.RouterWare = (function(R){
 
-	var ts = toolstack,
+	var ts = require('toolstack').ToolStack,
 	util = ts.Utility,
-	url = url,
-	r = R;
+	url = require('url'),
+	getr = /^get$|^head$/,postr = /^post$|^put$|^delete$/,
+	r = R, Ware = {};
+	
 
-	return function(notfoundhandler){
+	Ware.create = function(notfoundhandler){
 
 		if(!notfoundhandler) notfoundhandler = function(err,req,res){
 			var status = (err && err.status) ? err.status : 404;
@@ -16,7 +18,7 @@ module.exports.RouterWare = (function(toolstack,R,url){
 			req.destroy();
 		};
 
-		return ts.Middleware(function(key){
+		var ware = ts.Middleware(function(key){
 			if(!key){
 				var route = /\*/; route.binding = '*';
 				return route;
@@ -48,13 +50,37 @@ module.exports.RouterWare = (function(toolstack,R,url){
 			else return false;
 		},notfoundhandler);
 
+		return ware;
 	};
+
+	Ware.Router = function(server,notfound){
+		var routerware = this.create()(notfound);
+		routerware.server = server;
+
+		//helper functions to easier readability and scope
+		routerware.get = function(mount,response){
+			routerware.use(mount,function(req,res,next)){
+				if(req.method.toLowerCase() === )
+			};
+		};
+
+		routerware.post = function(mount,response){
+
+		};
+
+		//setup links for startup;
+		routerware.server.on('request',this.routerware.start);
+		routerware.listen = function(port,ip,onConnect){
+			return routerware.server.listen(port,ip,onConnect);
+		};
+
+		return routerware;
+	};
+
+	return Ware;
 
 
 	// appware = router();
-	//appware.use(function(req,res,next){
-
-	// });
 
 	// appware.use('/admins',function(req,res,next){
 	// 	console.log(req,res,next);

@@ -1,9 +1,12 @@
-module.exports.BodyParser = function(util,qs){
+;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
+Middleware.BodyParser = function BodyParserSetup(r){
 
-	var formidable = require('formidable');
-	return function BodyParser(options) {
+	var util = require('toolstack').ToolStack.Utility, qs = require('querystring'),
+	formidable = require('formidable');
+
+	return function BodyParserOptions(options) {
 		
-		return function(req,res,next){
+		return function BodyParser(req,res,next){
 			if(req._body) return next();
 
 			req.body = req.body || {}; 
@@ -11,7 +14,7 @@ module.exports.BodyParser = function(util,qs){
 
 
 			if("get" === req.method.toLowerCase() || 'head' === req.method.toLowerCase()) return next();
-			// if(req.headers['content-type'].split(';')[0] !== 'multipart/form-data') return next();
+			if(req.headers['content-type'].split(';')[0] !== 'multipart/form-data') return next();
 
 			var done = false, proceed = next, 
 			param = { data: {}, files: {}},
