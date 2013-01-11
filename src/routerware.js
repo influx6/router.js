@@ -7,7 +7,7 @@ module.exports.RouterWare = (function(R){
 	r = R, Ware = {};
 	
 
-	Ware.create = function(notfoundhandler){
+	Ware.Generate = function(notfoundhandler){
 
 		if(!notfoundhandler) notfoundhandler = function(err,req,res){
 			var status = (err && err.status) ? err.status : 404;
@@ -54,22 +54,45 @@ module.exports.RouterWare = (function(R){
 	};
 
 	Ware.Router = function(server,notfound){
-		var routerware = this.create()(notfound);
+		var routerware = Ware.Generate()(notfound);
 		routerware.server = server;
 
 		//helper functions to easier readability and scope
 		routerware.get = function(mount,response){
-			routerware.use(mount,function(req,res,next)){
-				if(req.method.toLowerCase() === )
-			};
+			routerware.use(mount,function(req,res,next){
+				if(req.method.toLowerCase().match(getr)){
+					return response.call(this,req,res,next);
+				}else return next();
+			});
 		};
 
 		routerware.post = function(mount,response){
-
+			routerware.use(mount,function(req,res,next){
+				if(req.method.toLowerCase().match(postr)){
+					return response.call(this,req,res,next);
+				}else return next();
+			});
 		};
 
+		// routerware.put = function(mount,response){
+		// 	routerware.use(mount,function(req,res,next){
+		// 		if(req.method.toLowerCase().match(postr)){
+		// 			return response.call(this,req,res,next);
+		// 		}else return next();
+		// 	});
+		// };
+
+
+		// routerware.delete = function(mount,response){
+		// 	routerware.use(mount,function(req,res,next){
+		// 		if(req.method.toLowerCase().match(postr)){
+		// 			return response.call(this,req,res,next);
+		// 		}else return next();
+		// 	});
+		// };
+
 		//setup links for startup;
-		routerware.server.on('request',this.routerware.start);
+		routerware.server.on('request',routerware.start);
 		routerware.listen = function(port,ip,onConnect){
 			return routerware.server.listen(port,ip,onConnect);
 		};

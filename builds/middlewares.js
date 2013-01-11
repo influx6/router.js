@@ -70,7 +70,7 @@ Middleware.BodyParser = function BodyParserSetup(r){
 Middleware.FileServer = function FileServerSetup(r){
 
 	var util = require('toolstack').ToolStack.Utility, r = r,
-	path = require('path'), fs = require('fs');
+	url = require('url'),path = require('path'), fs = require('fs');
 
 	return function FileServerOptions(dir,options){
 

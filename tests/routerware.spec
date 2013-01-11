@@ -1,11 +1,13 @@
 var r = require('../builds/router');
 midwares = r.Middleware,
-rware = r.RouterWare(r.R)(),
+router = r.RouterWare(r.R),
+server = require('http').createServer(),
+app = router.Router(server);
 
-ware = rware();
 
+r.InitWare();
 
-ware.use(function(req,res,next){
+app.use(function(req,res,next){
 	if(req.rawbody) return next();
 	req.setEncoding('utf8');
 	req.rawbody = true;
@@ -16,11 +18,12 @@ ware.use(function(req,res,next){
 
 });
 
-ware.use(logger({ immediate: false}));
-ware.use(bparser());
-ware.use('/public/*',fserver(__dirname,{ redirect: true, log: ts.Console.init('web') }));
-ware.use(midwares.Query())
-ware.use(function(err,req,res,next){
+app.use(midwares.Logger({ immediate: false}));
+app.use(midwares.BodyParser());
+app.use('/public/*',midwares.FileServer(__dirname,{ redirect: true}));
+app.use(midwares.Query());
+
+app.use(function(err,req,res,next){
 	if(err){
 		var stack = (err && err.stack) ? err.stack : '';
 		res.setStatus(404).pushHead();
@@ -30,42 +33,41 @@ ware.use(function(err,req,res,next){
 	}
 });
 
-ware.use("/",function(req,res,next){
+app.get("/",function(req,res,next){
 	res.setStatus(200).setContent('text/plain').pushHead();
 	res.end("welcome to root");
 	return next();
 });
 
-ware.use('/admins',function(req,res,next){
+app.use('/admins',function(req,res,next){
 	res.setStatus(200).setContent('text/plain').pushHead();
 	res.end("welcome to central admin");
 	return next();
 });
 
-ware.use('/admins/create',function(req,res,next){
+app.use('/admins/create',function(req,res,next){
 	res.setStatus(200).setContent('text/plain').pushHead();
 	res.end('welcome ,lets create your admin');
 	return next();
 });
 
-ware.use('/admin/:id',function(req,res,next){
+app.use('/admin/:id',function(req,res,next){
 	res.setStatus(200).setContent('text/plain').pushHead();
 	res.end('welcome admin with id:'+ req.params.id);
 	return next();
 });
 
-ware.use('/admin/:id/:country',function(req,res,next){
+app.use('/admin/:id/:country',function(req,res,next){
 	res.setStatus(200).setContent('text/plain').pushHead();
 	res.end('welcome admin with id:'+req.params.id+' and country:'+req.params.country);
 	return next();
 });
 
-ware.use('/a/:id',function(req,res,next){
+app.use('/a/:id',function(req,res,next){
 	res.setStatus(200).setContent('text/plain')
 	.addHeader('location','http://127.0.0.1:3000/admin/'+ req.params.id).pushHead();
 	res.end('you are being redirect');
 	return next();
 });
 
-server = require('http').createServer(ware.start);
-server.listen(3000);
+app.listen(3000);
