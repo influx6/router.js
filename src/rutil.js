@@ -272,4 +272,4 @@
 
 	return R;
 
-})(require('toolstack').ToolStack.Utility,require('http'),require('crypto'));
+})(require('ts').ToolStack.Utility,require('http'),require('crypto'));

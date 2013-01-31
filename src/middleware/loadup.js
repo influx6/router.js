@@ -3,7 +3,7 @@
 
 	if(!this.Middleware || this.Middleware.initd) return;
 	var wares = this.Middleware, r = this.R;
-	util = require('toolstack').ToolStack.Utility;
+	util = require('ts').ToolStack.Utility;
 
 	util.forEach(wares,function(e,i,o){
 		wares[i] = e(r);

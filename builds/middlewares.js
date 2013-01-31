@@ -1,7 +1,7 @@
 ;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
 Middleware.BodyParser = function BodyParserSetup(r){
 
-	var util = require('toolstack').ToolStack.Utility, qs = require('querystring'),
+	var util = require('ts').ToolStack.Utility, qs = require('querystring'),
 	formidable = require('formidable');
 
 	return function BodyParserOptions(options) {
@@ -69,7 +69,7 @@ Middleware.BodyParser = function BodyParserSetup(r){
 ;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
 Middleware.FileServer = function FileServerSetup(r){
 
-	var util = require('toolstack').ToolStack.Utility, r = r,
+	var util = require('ts').ToolStack.Utility, r = r,
 	url = require('url'),path = require('path'), fs = require('fs');
 
 	return function FileServerOptions(dir,options){
@@ -141,7 +141,7 @@ Middleware.FileServer = function FileServerSetup(r){
 };;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
 Middleware.Logger = function LoggerSetup(r){
 
-	var ts = require('toolstack').ToolStack,
+	var ts = require('ts').ToolStack,
 	Console = ts.Console.init('node'),
 	url = require('url'),
 	util = ts.Utility, r = r;
@@ -208,7 +208,7 @@ Middleware.Query = function QuerySetup(r){
 
 	if(!this.Middleware || this.Middleware.initd) return;
 	var wares = this.Middleware, r = this.R;
-	util = require('toolstack').ToolStack.Utility;
+	util = require('ts').ToolStack.Utility;
 
 	util.forEach(wares,function(e,i,o){
 		wares[i] = e(r);

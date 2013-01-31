@@ -1,6 +1,6 @@
 module.exports.RouterWare = (function(R){
 
-	var ts = require('toolstack').ToolStack,
+	var ts = require('ts').ToolStack,
 	util = ts.Utility,
 	url = require('url'),
 	getr = /^get$|^head$/,postr = /^post$|^put$|^delete$/,

@@ -1,7 +1,7 @@
 ;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
 Middleware.Logger = function LoggerSetup(r){
 
-	var ts = require('toolstack').ToolStack,
+	var ts = require('ts').ToolStack,
 	Console = ts.Console.init('node'),
 	url = require('url'),
 	util = ts.Utility, r = r;
