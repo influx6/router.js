@@ -1,5 +1,4 @@
-;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.BodyParser = function BodyParserSetup(r){
+;var bodyparser = function BodyParserSetup(r){
 
 	var util = require('ts').ToolStack.Utility, qs = require('querystring'),
 	formidable = require('formidable');

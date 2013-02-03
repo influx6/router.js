@@ -1,4 +1,4 @@
-;module.exports.R = (function(utility,http,crypto){
+;var R = (function(utility,http,crypto){
 
 
 	var R = {

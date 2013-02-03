@@ -1,0 +1,36 @@
+{
+  "name": "router",
+  "version": "0.0.2",
+  "description": "a simple middleware based router",
+  "main": "./router.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "connect": "~2.5.0",
+    "cookie": "~0.0.4",
+    "crc": "~0.2.0",
+    "debug": "~0.7.0",
+    "fresh": "~0.1.0",
+    "methods": "~0.0.1",
+    "commander": "~0.6.1",
+    "mkdirp": "~0.3.3",
+    "range-parser": "~0.0.4",
+    "send": "~0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/influx6/router.js.git"
+  },
+  "keywords": [
+    "router",
+    "middleware"
+  ],
+  "author": "Alexander Ewetumo",
+  "license": "Mit",
+  "gitHead": "c03d3984952c5d84a9a42ca12ce8716c6306fe57"
+}

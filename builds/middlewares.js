@@ -1,5 +1,4 @@
-;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.BodyParser = function BodyParserSetup(r){
+;var bodyparser = function BodyParserSetup(r){
 
 	var util = require('ts').ToolStack.Utility, qs = require('querystring'),
 	formidable = require('formidable');
@@ -66,16 +65,15 @@ Middleware.BodyParser = function BodyParserSetup(r){
 
 };
 
-;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.FileServer = function FileServerSetup(r){
+;var fileserver = function FileServerSetup(r){
 
 	var util = require('ts').ToolStack.Utility, r = r,
 	url = require('url'),path = require('path'), fs = require('fs');
 
 	return function FileServerOptions(dir,options){
 
-		var root = dir, settings = options;
-
+		var root = path.resolve(dir), settings = options;
+		
 		return function FileServer(req,res,next){
 			if(req._servedFile) return next();
 
@@ -138,8 +136,7 @@ Middleware.FileServer = function FileServerSetup(r){
 		};
 	};
 
-};;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.Logger = function LoggerSetup(r){
+};;var logger = function LoggerSetup(r){
 
 	var ts = require('ts').ToolStack,
 	Console = ts.Console.init('node'),
@@ -185,8 +182,7 @@ Middleware.Logger = function LoggerSetup(r){
 		};
 
 	};
-};var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.Query = function QuerySetup(r){
+};var query = function QuerySetup(r){
 
   var qs = require('querystring'),url = require('url');
 
@@ -203,16 +199,4 @@ Middleware.Query = function QuerySetup(r){
 
 	};
 
-};;module.exports.InitWare = function InitWare(){
-
-
-	if(!this.Middleware || this.Middleware.initd) return;
-	var wares = this.Middleware, r = this.R;
-	util = require('ts').ToolStack.Utility;
-
-	util.forEach(wares,function(e,i,o){
-		wares[i] = e(r);
-	});
-
-	this.Middleware.initd = true;
-}
+};

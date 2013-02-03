@@ -1,4 +1,4 @@
-module.exports.RouterWare = (function(R){
+;var routerware = (function(R){
 
 	var ts = require('ts').ToolStack,
 	util = ts.Utility,
