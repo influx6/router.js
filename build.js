@@ -18,7 +18,7 @@ js.compile({
 
 
 js.compile({
-	build_dir: builds,
+	build_dir: './',
 	src_dir:"./builds",
 	name:"router.js",
 	uglify: uglify,
