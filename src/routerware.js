@@ -1,6 +1,6 @@
-module.exports.RouterWare = (function(R){
+;var routerware = (function(R){
 
-	var ts = require('ts').ToolStack,
+	var ts = require('tsk').ToolStack,
 	util = ts.Utility,
 	url = require('url'),
 	getr = /^get$|^head$/,postr = /^post$|^put$|^delete$/,
@@ -12,9 +12,12 @@ module.exports.RouterWare = (function(R){
 		if(!notfoundhandler) notfoundhandler = function(err,req,res){
 			var status = (err && err.status) ? err.status : 404;
 			var message = (err && err.message) ? err.message  : "Request Not Found!";
+			var stack = (err && err.stack ) ? err.stack : null;
 
 			res.writeHead(status,{ 'content-type':'text/plain'});
-			res.end(message);
+			res.write("Error: "+message+"\n");
+			if(stack) res.write(stack);
+			res.end();
 			req.destroy();
 		};
 
@@ -24,7 +27,7 @@ module.exports.RouterWare = (function(R){
 				return route;
 			}
 			var open = key[key.length - 1] === '*' ? true : false;
-			var procs = r.processMount(key,open);
+			var procs = (util.isRegExp(key)) ? r.processRegExp(key) : r.processMount(key,open);
 			var route = procs.mount;
 			route.params = procs.params;
 			route.setsplit = procs.split;

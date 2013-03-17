@@ -1,13 +1,12 @@
-;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.FileServer = function FileServerSetup(r){
+;var fileserver = function FileServerSetup(r){
 
 	var util = require('ts').ToolStack.Utility, r = r,
 	url = require('url'),path = require('path'), fs = require('fs');
 
 	return function FileServerOptions(dir,options){
 
-		var root = dir, settings = options;
-
+		var root = path.resolve(dir), settings = options;
+		
 		return function FileServer(req,res,next){
 			if(req._servedFile) return next();
 

@@ -1,5 +1,8 @@
-;module.exports.R = (function(utility,http,crypto){
+;var R = (function(){
 
+	var utility = util = require('tsk').ToolStack.Utility;
+		// http = require('http'),
+		// crypto = require('crypto');
 
 	var R = {
 		HttpStatusCodes:{ 
@@ -62,58 +65,6 @@
 	  	},
 	};
 
-		// R.log = {
-		// 	default: function(req,msg,to){
-		// 		var path = url.parse(req.url),host = req.headers.host;
-		// 		return utility.makeString(" ","Info:".red,req.method.green,"Page".grey,path.pathname.green,msg.grey,host.magenta,"on".grey,(new Date()).toUTCString().yellow);
-		// 	},
-		// 	redirect: function(req,to){
-		// 		debug.log(this.default(req,"redirect to "+to.green+" from".grey));
-		// 	},
-		// 	custom: function(req,message,to){
-		// 		debug.log(this.default(req,message,to));
-		// 	}
-		// };
-
-		R.basic = {
-			find : function(item){
-					if(!this[item]) return false;
-					return this[item];
-			},
-			set : function(item,value,force){
-					if(this[item] && !force) return this[item];
-					this[item] = value;
-					return this[item];
-			}
-		};
-
-		R.searchable = {
-
-			find : function(item,success,failure){
-				var count = 0, size = utility.keys(this).length - 1;
-				if(!failure) failure = function(){};
-
-				utility.eachAsync(this,function(e,i,o,fn){
-					if(count === size) fn(true);
-					count += 1;
-					fn(false);
-				},function(err){
-					if(err) failure();
-				},this,function(e,i,o){
-					var match = item.match(e.mount);
-					if(utility.isObject(e) && match){ success(e,match); return true;}
-					return false;
-				});
-
-			},
-
-			set : function(item,value,force){
-					if(this[item] && !force) return this[item];
-					this[item] = value;
-					return this[item];
-			}
-		};
-
 		R.helpers = function(scope,ext){
 			scope.find = function(){ return ext.find.apply(scope, arguments); };
 			scope.set = function(){ return ext.set.apply(scope,arguments); };
@@ -139,11 +90,29 @@
 			pure: /\/([\w|\d|\-|\_]+)/,
 			addit: /\/*([\w|\d|\-|\_]*)/,
 			asterick: /\*/,
+			idc: /:id/,
+			textc: /:text/,
+			id: /\/([\d]+)/,
+			text: /\/([\w_-]+)/,
 			// rootsplitter: /^\/([\w|\d|\-|\_]+)(\/)/,
 			// rootextender: /^\/([\w|\d|\-|\_]+)(\/[:\w\W]+)/,
 			rootextender: /(\/[\w|\d|\-|\_]+)(\/$|\/[\w\W]+)/
 		};
 
+		R.processRegExp = function(reg){
+			if(!utility.isRegExp(reg)) return false;
+
+			var unit = {};
+			unit.mount = unit.orig = reg;
+			unit.split = utility.normalizeArray(reg.toString().replace(/\\+|\++/ig,'').split('/'));
+			unit.params = {};
+
+			utility.each(unit.split,function(e,i,o,fn){
+				unit.params[i]= null;
+			});
+
+			return unit;
+		};
 
 		R.processMount = function(mount,open){
 				var temp = mount,
@@ -165,7 +134,11 @@
 						set[e] = null;
 					}
 					else if(e.match(m.param)){ 
-						var item = e.match(m.param),tmp = utility.values(m.pure.toString());
+						var item = e.match(m.param),
+						tmp = utility.values( e.match(m.idc) ? m.id.toString() : 
+								( e.match(m.textc) ? 
+								m.text.toString() : m.pure.toString()) );
+
 						tmp[0] = tmp[tmp.length - 1] = '';
 						set[item[1]] = null;
 						join.push(tmp.join(''));
@@ -187,54 +160,6 @@
 				return unit;
 		};
 
-		//
-		// HTTP Error objectst
-		//
-		// R.Errors.BadRequest = function (msg) {
-		//     // status = 400;
-		//     // headers = {};
-		//     // body = { error: msg };
-		// };
-
-		// R.Errors.NotFound = function (msg) {
-		//     // .status = 404;
-		//     // .headers = {};
-		//     // .body = { error: msg };
-		// };
-
-		// R.Errors.MethodNotAllowed = function (allowed) {
-		//     // .status = 405;
-		//     // .headers = { allow: allowed };
-		//     // .body = { error: "method not allowed." };
-		// };
-
-		// R.Errors.NotAcceptable = function (accept) {
-		//     // .status = 406;
-		//     // .headers = {};
-		//     // .body = {
-		//     //     error: "cannot generate '" + accept + "' response",
-		//     //     only: "application/json"
-		//     // };
-		// };
-
-		// R.Errors.NotImplemented = function (msg) {
-		//     // .status = 501;
-		//     // .headers = {};
-		//     // .body = { error: msg };
-		// };
-
-		// R.Errors.NotAuthorized = function (res) {
-		//     // .status = 401;
-		//     // .headers = {};
-		//     // .body = { error: msg || 'Not Authorized' };
-		// };
-		// R.Errors.Forbidden = function (res) {
-		//     // .status = 403;
-		//     // .headers = {};
-		//     // .body = { error: msg || 'Forbidden' };
-		// };
-
-
 	/*!
 	 * Connect - utils
 	 * Copyright(c) 2010 Sencha Inc.
@@ -253,23 +178,17 @@
 		return err;
 	};
 
-	R.md5 = function(str,encoding){
-		return crypto.createHash('md5').update(str).digest(encoding || 'hex');
-	};
+	// R.md5 = function(str,encoding){
+	// 	return crypto.createHash('md5').update(str).digest(encoding || 'hex');
+	// };
 
-	R.uid = function(len) {
-	  return crypto.randomBytes(Math.ceil(len * 3 / 4))
-	    .toString('base64')
-	    .slice(0, len);
-	};
-
-	// R.unauthorized = function(res, realm) {
-	//   res.statusCode = 401;
-	//   res.setHeader('WWW-Authenticate', 'Basic realm="' + realm + '"');
-	//   res.end('Unauthorized');
+	// R.uid = function(len) {
+	//   return crypto.randomBytes(Math.ceil(len * 3 / 4))
+	//     .toString('base64')
+	//     .slice(0, len);
 	// };
 
 
 	return R;
 
-})(require('ts').ToolStack.Utility,require('http'),require('crypto'));
+})();

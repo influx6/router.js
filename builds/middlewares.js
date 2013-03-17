@@ -1,5 +1,4 @@
-;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.BodyParser = function BodyParserSetup(r){
+;var bodyparser = function BodyParserSetup(r){
 
 	var util = require('ts').ToolStack.Utility, qs = require('querystring'),
 	formidable = require('formidable');
@@ -66,16 +65,15 @@ Middleware.BodyParser = function BodyParserSetup(r){
 
 };
 
-;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.FileServer = function FileServerSetup(r){
+;var fileserver = function FileServerSetup(r){
 
 	var util = require('ts').ToolStack.Utility, r = r,
 	url = require('url'),path = require('path'), fs = require('fs');
 
 	return function FileServerOptions(dir,options){
 
-		var root = dir, settings = options;
-
+		var root = path.resolve(dir), settings = options;
+		
 		return function FileServer(req,res,next){
 			if(req._servedFile) return next();
 
@@ -138,8 +136,7 @@ Middleware.FileServer = function FileServerSetup(r){
 		};
 	};
 
-};;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.Logger = function LoggerSetup(r){
+};;var logger = function LoggerSetup(r){
 
 	var ts = require('ts').ToolStack,
 	Console = ts.Console.init('node'),
@@ -148,8 +145,8 @@ Middleware.Logger = function LoggerSetup(r){
 
 	return function LoggerOptions(options){
 
-		var format = function(host,port,url,method,message){
-			return util.makeString(" ",'Info:'.grey,method.green,'Page'.grey,url.yellow,message.grey,host.magenta+':'+port.magenta,"on".grey,(new Date()).toUTCString().grey);
+		var format = function(host,port,url,method,message,status){
+			return util.makeString(" ",'Info:'.grey,('' + (util.isNumber(status) ? status : 304)).magenta,method.green,'Page'.grey,url.yellow,message.grey,host.magenta+':'+port.magenta,"on".grey,(new Date()).toUTCString().grey);
 		};
 
 		return function Logger(req,res,next){
@@ -162,31 +159,27 @@ Middleware.Logger = function LoggerSetup(r){
 
 			req._logged = true;
 
-			function choice(state){
-				if(state === 'get') return format(host,port,pathname,method,'requested from');
-				if(state === 'post') return format(host,port,pathname,method,'posted message to');
-				if(state === 'head') return format(host,port,pathname,method,'headers requested from');
+			function choice(state,status){
+				if(state === 'get') return format(host,port,pathname,method,'requested from',status);
+				if(state === 'post') return format(host,port,pathname,method,'posted message to',status);
+				if(state === 'head') return format(host,port,pathname,method,'headers requested from',status);
 			};
 			
 
-			if(options.immediate){
-				Console.log(choice(method.toLowerCase()));
-			}else{
-				var res_end = res.end;
-				res.end = function(chunk,encoding){
-					res.end = res_end;
-					res.end(chunk,encoding);
-					Console.log(choice(method.toLowerCase()));
-					return;
-				};
-			}
+		
+			var res_end = res.end;
+			res.end = function(chunk,encoding){
+				res.end = res_end;
+				res.end(chunk,encoding);
+				Console.log(choice(method.toLowerCase(),res.statusCode));
+				return;
+			};
 
 			return next();
 		};
 
 	};
-};var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.Query = function QuerySetup(r){
+};var query = function QuerySetup(r){
 
   var qs = require('querystring'),url = require('url');
 
@@ -203,16 +196,4 @@ Middleware.Query = function QuerySetup(r){
 
 	};
 
-};;module.exports.InitWare = function InitWare(){
-
-
-	if(!this.Middleware || this.Middleware.initd) return;
-	var wares = this.Middleware, r = this.R;
-	util = require('ts').ToolStack.Utility;
-
-	util.forEach(wares,function(e,i,o){
-		wares[i] = e(r);
-	});
-
-	this.Middleware.initd = true;
-}
+};

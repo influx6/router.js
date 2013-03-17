@@ -1,5 +1,4 @@
-;var Middleware = module.exports.Middleware = module.exports.Middleware || {};
-Middleware.Query = function QuerySetup(r){
+;var query = function QuerySetup(r){
 
   var qs = require('querystring'),url = require('url');
 
