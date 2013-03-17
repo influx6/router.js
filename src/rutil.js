@@ -76,7 +76,8 @@
 			var params = {};
 			utility.eachAsync(templ,function(e,i,o){
 			   var k = e.split(':'), c = keys[i];
-			   if(k[1]) params[k[1]] = c;
+			   if(k.length > 1 && k[1]) params[k[1]] = c;
+			   else params[k[0]] = c;
 			},null,this);
 			return params;
 		};
@@ -107,8 +108,9 @@
 			unit.split = utility.normalizeArray(reg.toString().replace(/\\+|\++/ig,'').split('/'));
 			unit.params = {};
 
-			utility.each(unit.split,function(e,i,o,fn){
-				unit.params[i]= null;
+			utility.each(unit.split,function(e,i,o){
+				// if(e === 'd') unit.params['id'] = null
+				unit.params[e] = null;
 			});
 
 			return unit;

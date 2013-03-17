@@ -46,8 +46,8 @@
 			pathname = pathname.replace(/\/+$/,'/'); path.pathname = pathname;
 			if('/' === pathname[pathname.length - 1] && pathname.length > 1) pathname = pathname.slice(0,-1);
 			if(key.test(pathname) || key.test('*')){
-				var clean = pathname.split('/');
-				req.params = r.params(key.setsplit,util.makeSplice(clean,1,clean.length));
+				var clean = util.normalizeArray(pathname.split('/'));
+				req.params = r.params(key.setsplit,clean);
 				return true;
 			}
 			else return false;
