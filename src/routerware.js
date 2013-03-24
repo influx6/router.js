@@ -58,7 +58,7 @@
 
 	Ware.Router = function(server,notfound){
 		var routerware = Ware.Generate()(notfound);
-		routerware.server = server;
+		routerware.server = server || require('http').createServer();
 
 		//helper functions to easier readability and scope
 		routerware.get = function(mount,response){
@@ -99,6 +99,10 @@
 		routerware.listen = function(port,ip,onConnect){
 			return routerware.server.listen(port,ip,onConnect);
 		};
+		// routerware.pipeOut = function(proc){
+		// 	if(!proc || !util.isObject(proc)) return;
+		// 	this.server.stdout.pipe(proc.stdout,{ end: false });
+		// };
 
 		return routerware;
 	};

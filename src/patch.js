@@ -43,6 +43,11 @@
 			return this;
 		};
 
+		response.Status = response.setStatus;
+		response.Content = response.setContent;
+		response.Cookie = response.SetCookie;
+		response.push = response.pushHead;
+
 		// response.setHeaders = function(field,val){
 		// 	var fd = this.getHeader(field);
 		// 	var vl = Array.isArray(fd) ? fd.concat(val) : [prev,val];
